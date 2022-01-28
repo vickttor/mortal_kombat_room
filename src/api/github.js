@@ -5,7 +5,7 @@ export default function RequestGithubAPI(username){
         return {
             name:data.name,
             location:data.location,
-            repositorys:data.public_repos,
+            repositories:data.public_repos,
         }
     })
 }

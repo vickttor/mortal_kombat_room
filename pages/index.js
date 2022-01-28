@@ -1,14 +1,11 @@
 /**
- * 
- * @TODO fix the resolution to mobile by setting width of the Box form and Box Github Fields
- * @TODO implement debounce using lodash
- * @see https://medium.com/nerd-for-tech/debounce-your-search-react-input-optimization-fd270a8042b
+ * @TODO add icons by using Icons from skynexui/components
  * @TODO keep going through the course
  */
 
 
 // Dependencies skynexui/components
-import { Box, Button, Text, TextField, Image} from "@skynexui/components"; 
+import { Box, Button, Text, TextField, Image, Icon} from "@skynexui/components"; 
 
 // React Hooks 
 import React from 'react'
@@ -17,9 +14,13 @@ import { useRouter } from "next/router";
 // Tilt effect lib
 import Tilt from "react-tilt";
 
+// Debounce
+import _ from "lodash";
+
 // Files
 import appConfig from "../config.json";
 import RequestGithubAPI from "../src/api/github";
+
 
 // Title function (component), that receive a `props` as an argument.
 // This props is an object that allow us to access the children
@@ -49,9 +50,12 @@ const Title = (props) =>{
 
 const GithubField = (props) => {
   return(
-    <Text as="p" variant="body3" styleSheet={{
+    <Text as="p" variant="body4" styleSheet={{
       backgroundColor:appConfig.theme.colors.neutrals[900],
-      padding: '3px 10px',
+      padding: ' 0.5rem 0.8rem',
+      display:'flex',
+      alignItems:'center',
+      gap:'0.8rem',
       borderRadius: '1000px'
     }}>
       {props.children}
@@ -62,16 +66,28 @@ const GithubField = (props) => {
 
 // Exporting default function
 export default function HomePage() {
+
+    // Using state and router hooks from react
     const [username, setUsername] = React.useState("");
     const router = useRouter();
 
 
     // Requiring data user from api github
     const [data, setData] = React.useState({});
-
-    RequestGithubAPI(username).then((data)=> {
-      setData({...data})
-    })
+    // Using Debounce
+    // We're using useMemo to persist data in re-render
+    // this is essentialy to avoid lose data between the re-render of the debounce
+    const onChange = (value) => {
+      // Getting event.target.value as value from parameter
+      RequestGithubAPI(value).then((data)=>{
+        // Setting the data
+        setData({...data})
+      })
+    }
+    // `debounce` will execute `onChange` after 0.5 seconds of insertion 
+    //while user is typing input, function is not executed
+    const debounceResults = _.debounce(onChange,500); 
+    const debounceOnChange = React.useCallback(debounceResults,[]);
 
 
     return (
@@ -89,7 +105,7 @@ export default function HomePage() {
           }}
         >
           {/* Tilt Effect component */}
-          <Tilt className="Tilt" options={{max:8, speed:200, scale:1}}>
+          <Tilt className="Tilt" options={{max:8, speed:200, scale:1}} style={{width:"100%", maxWidth:"700px"}}>
             
             <Box className="Tilt-inner"
             styleSheet={{
@@ -101,8 +117,8 @@ export default function HomePage() {
                 sm: 'row',
               },
               gap:"0.8rem",
-              width: '700px',
-              borderRadius: '5px', padding: '32px', margin: '16px',
+              width: '100%',
+              borderRadius: '5px', padding: '32px', margin: '0.9rem 0 0.9rem 0',
               boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
               backgroundColor: appConfig.theme.colors.neutrals[700],
             }}
@@ -141,11 +157,8 @@ export default function HomePage() {
                 }}
                 value={username}
                 onChange={(event)=>{
-                  // Getting the new value of the input
-                  const newValue = event.target.value;
-                  // Using the newValue on setUsername function to change the state of the
-                  // username variable
-                  setUsername(newValue)
+                  setUsername(event.target.value)
+                  debounceOnChange(event.target.value)
                 }}
               />
               <Button
@@ -172,6 +185,7 @@ export default function HomePage() {
                 maxWidth: '200px',
                 padding: '16px',
                 backgroundColor: appConfig.theme.colors.neutrals[800],
+                color: appConfig.theme.colors.neutrals[200],
                 border: '1px solid',
                 borderColor: appConfig.theme.colors.neutrals[999],
                 borderRadius: '10px',
@@ -196,7 +210,7 @@ export default function HomePage() {
                   borderRadius: '1000px'
                 }}
               >
-                {username || "User"}
+                {data.name || "User"}
               </Text>
             </Box>
             {/* Photo Area */}
@@ -205,8 +219,8 @@ export default function HomePage() {
           </Tilt>
 
           {/* Github Informations API */}
-          <Tilt options={{max:5, speed:100, scale:1}}>
-            <Box styleSheet={{
+          <Tilt className="Tilt" options={{max:5, speed:100, scale:1}} style={{width:"100%",maxWidth:"580px"}}>
+            <Box className="Tilt-inner" styleSheet={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-evenly',
@@ -215,16 +229,16 @@ export default function HomePage() {
                   sm: 'row',
                 },
                 gap:"0.8rem",
-                width: '580px',
-                borderRadius: '5px', padding: '0.9rem', margin: '0.9rem',
+                width: '100%', 
+                borderRadius: '5px', padding: '0.9rem', margin: '0.9rem 0 0.9rem 0',
                 boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
                 backgroundColor: appConfig.theme.colors.neutrals[700],
                 color: appConfig.theme.colors.neutrals[200]
               }}>
               
-                <GithubField>{data.name || "name"}</GithubField>
-                <GithubField>{data.location || "location"}</GithubField>
-                <GithubField>{data.repositorys || "repositorys"}</GithubField>
+                <GithubField><Icon name="FaGithub" size="2.0ch"/>{username || "username"}</GithubField>
+                <GithubField><Icon name="FaMapMarkedAlt" size="2.0ch"/>{data.location || "location"}</GithubField>
+                <GithubField><Icon name="FaProjectDiagram" size="2.0ch"/>{data.repositories || "repositories"}</GithubField>
             </Box>
           </Tilt>
         </Box>
