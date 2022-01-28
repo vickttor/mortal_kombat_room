@@ -1,6 +1,8 @@
 {
     "name": "Aluracord - MKRoom",
     "theme": {
+
+        "backgroundImage": "https://cdn.wallpapersafari.com/93/6/xDCnmq.jpg",
         "colors": {
             "primary": {
                 "100": "#F9B062",

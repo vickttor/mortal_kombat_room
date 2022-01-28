@@ -1,9 +1,3 @@
-/**
- * @TODO add icons by using Icons from skynexui/components
- * @TODO keep going through the course
- */
-
-
 // Dependencies skynexui/components
 import { Box, Button, Text, TextField, Image, Icon} from "@skynexui/components"; 
 
@@ -96,10 +90,7 @@ export default function HomePage() {
           styleSheet={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexDirection: 'column', padding:"1.5rem",
-            //other backgrounds =>
-            //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/2020-mortal-kombat-11-4k-ag.jpg)',
-            //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/mortal-kombat-11-art-4k-2c.jpg)',
-            backgroundImage: 'url(https://cdn.wallpapersafari.com/93/6/xDCnmq.jpg)',
+            backgroundImage: `url(${appConfig.theme.backgroundImage})`,
             backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
             width: '100vw', height: '100vh',
           }}
