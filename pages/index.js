@@ -1,39 +1,25 @@
-// Dependencies
+/**
+ * 
+ * @TODO fix the resolution to mobile by setting width of the Box form and Box Github Fields
+ * @TODO implement debounce using lodash
+ * @see https://medium.com/nerd-for-tech/debounce-your-search-react-input-optimization-fd270a8042b
+ * @TODO keep going through the course
+ */
+
+
+// Dependencies skynexui/components
 import { Box, Button, Text, TextField, Image} from "@skynexui/components"; 
+
+// React Hooks 
+import React from 'react'
+import { useRouter } from "next/router";
+
+// Tilt effect lib
+import Tilt from "react-tilt";
+
+// Files
 import appConfig from "../config.json";
-//Defining global Styles to use in the components
-//TO use it, just add it as a tag on the top of the argument
-function GlobalStyle(){
-    return(
-        <style global jsx>{`
-        
-            *{
-                margin:0;
-                padding:0;
-                box-sizing:border-box;
-                list-style:none;
-            }
-
-            body{
-                font-family: 'Open Sans', sans-serif;    
-            }
-            /* App fit height */
-            html, body, #_next {
-                min-height: 100vh;
-                display:flex;
-                flex:1;
-            }
-            #_next{
-                flex:1;
-            }
-            #_next > * {
-                flex: 1;
-            }
-            /* ./App fit Height */
-        `}</style>
-    );
-}
-
+import RequestGithubAPI from "../src/api/github";
 
 // Title function (component), that receive a `props` as an argument.
 // This props is an object that allow us to access the children
@@ -42,7 +28,6 @@ function GlobalStyle(){
 const Title = (props) =>{
     // Get the `tag` parameter
     const Tag = props.tag || 'h2';
-
 
     return (
         <>  
@@ -62,40 +47,51 @@ const Title = (props) =>{
     );
 }
 
+const GithubField = (props) => {
+  return(
+    <Text as="p" variant="body3" styleSheet={{
+      backgroundColor:appConfig.theme.colors.neutrals[900],
+      padding: '3px 10px',
+      borderRadius: '1000px'
+    }}>
+      {props.children}
+    </Text>
+  )
+}
 
-// // Default component
-// function HomePage(){
-
-//     return (
-//         // Returning a div with the components above
-//         <div>
-//             <GlobalStyle/>
-//             <Title tag="h1">Hello World!</Title>
-//             <p>This is a paragraph</p>
-
-//         </div>
-//     )
-// }
 
 // Exporting default function
 export default function HomePage() {
-    const username = 'VictorSilva15';
-  
+    const [username, setUsername] = React.useState("");
+    const router = useRouter();
+
+
+    // Requiring data user from api github
+    const [data, setData] = React.useState({});
+
+    RequestGithubAPI(username).then((data)=> {
+      setData({...data})
+    })
+
+
     return (
       <>
-        <GlobalStyle />
         <Box
           styleSheet={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexDirection: 'column',
             //other backgrounds =>
             //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/2020-mortal-kombat-11-4k-ag.jpg)',
             //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/mortal-kombat-11-art-4k-2c.jpg)',
             backgroundImage: 'url(https://cdn.wallpapersafari.com/93/6/xDCnmq.jpg)',
             backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
-            width: '100vw', height: '100vh'
+            width: '100vw', height: '100vh',
           }}
         >
-          <Box
+          {/* Tilt Effect component */}
+          <Tilt className="Tilt" options={{max:8, speed:200, scale:1}}>
+            
+            <Box className="Tilt-inner"
             styleSheet={{
               display: 'flex',
               alignItems: 'center',
@@ -104,21 +100,31 @@ export default function HomePage() {
                 xs: 'column',
                 sm: 'row',
               },
-              width: '100%', maxWidth: '580px',
+              gap:"0.8rem",
+              width: '700px',
               borderRadius: '5px', padding: '32px', margin: '16px',
               boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
               backgroundColor: appConfig.theme.colors.neutrals[700],
             }}
           >
-            {/* Formulário */}
+            {/* Forms */}
+            
             <Box
               as="form"
+              onSubmit={(event)=>{
+                // preventing the default pattern (that is to search for a new href and submit)
+                event.preventDefault();
+
+                // Add the /chat path to nextjs manage the routes
+                router.push("/chat")
+              }}
               styleSheet={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
               }}
             >
               <Title tag="h2">Welcome Warrior</Title>
+              
               <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
                 {appConfig.name}
               </Text>
@@ -133,21 +139,29 @@ export default function HomePage() {
                     backgroundColor: appConfig.theme.colors.neutrals[800],
                   },
                 }}
+                value={username}
+                onChange={(event)=>{
+                  // Getting the new value of the input
+                  const newValue = event.target.value;
+                  // Using the newValue on setUsername function to change the state of the
+                  // username variable
+                  setUsername(newValue)
+                }}
               />
               <Button
                 type='submit'
-                label='Entrar'
+                label='Login'
                 fullWidth
                 buttonColors={{
                   contrastColor: appConfig.theme.colors.neutrals["000"],
                   mainColor: appConfig.theme.colors.primary[500],
                   mainColorLight: appConfig.theme.colors.primary[400],
-                  mainColorStrong: appConfig.theme.colors.primary[600],
+                  mainColorStrong: appConfig.theme.colors.primary[800],
                 }}
               />
             </Box>
-            {/* Formulário */}
-  
+            {/* Forms */}
+            
   
             {/* Photo Area */}
             <Box
@@ -170,7 +184,8 @@ export default function HomePage() {
                   borderRadius: '50%',
                   marginBottom: '16px',
                 }}
-                src={`https://github.com/${username}.png`}
+                src={`https://github.com/${username || "skynexui"}.png`}
+                alt="Photo User"
               />
               <Text
                 variant="body4"
@@ -181,11 +196,37 @@ export default function HomePage() {
                   borderRadius: '1000px'
                 }}
               >
-                {username}
+                {username || "User"}
               </Text>
             </Box>
             {/* Photo Area */}
-          </Box>
+            </Box>
+
+          </Tilt>
+
+          {/* Github Informations API */}
+          <Tilt options={{max:5, speed:100, scale:1}}>
+            <Box styleSheet={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                flexDirection: {
+                  xs: 'column',
+                  sm: 'row',
+                },
+                gap:"0.8rem",
+                width: '580px',
+                borderRadius: '5px', padding: '0.9rem', margin: '0.9rem',
+                boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+                backgroundColor: appConfig.theme.colors.neutrals[700],
+                color: appConfig.theme.colors.neutrals[200]
+              }}>
+              
+                <GithubField>{data.name || "name"}</GithubField>
+                <GithubField>{data.location || "location"}</GithubField>
+                <GithubField>{data.repositorys || "repositorys"}</GithubField>
+            </Box>
+          </Tilt>
         </Box>
       </>
     );
