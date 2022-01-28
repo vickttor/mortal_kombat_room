@@ -50,7 +50,7 @@ const Title = (props) =>{
 
 const GithubField = (props) => {
   return(
-    <Text as="p" variant="body4" styleSheet={{
+    <Text as="span" variant="body4" styleSheet={{
       backgroundColor:appConfig.theme.colors.neutrals[900],
       padding: ' 0.5rem 0.8rem',
       display:'flex',
@@ -95,7 +95,7 @@ export default function HomePage() {
         <Box
           styleSheet={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexDirection: 'column',
+            flexDirection: 'column', padding:"1.5rem",
             //other backgrounds =>
             //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/2020-mortal-kombat-11-4k-ag.jpg)',
             //backgroundImage: 'url(https://images.hdqwalls.com/wallpapers/mortal-kombat-11-art-4k-2c.jpg)',
@@ -118,7 +118,7 @@ export default function HomePage() {
               },
               gap:"0.8rem",
               width: '100%',
-              borderRadius: '5px', padding: '32px', margin: '0.9rem 0 0.9rem 0',
+              borderRadius: '5px', padding: '32px', margin: '1rem 0 1rem 0',
               boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
               backgroundColor: appConfig.theme.colors.neutrals[700],
             }}
