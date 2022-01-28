@@ -8,6 +8,14 @@ This repository store the source code of a chat application built in NextJS. The
 
 🚧 ... Developing ... 🚧
 
+## Preview
+
+<img src="./.github/loginPage.png" alt="Login Page"/>
+
+<br/>
+
+<img src="./.github/chatPage.png" alt="Chat Page"/>
+
 
 ## Requirements
 
