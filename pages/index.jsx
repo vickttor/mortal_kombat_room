@@ -14,48 +14,9 @@ import _ from "lodash";
 // Files
 import appConfig from "../config.json";
 import RequestGithubAPI from "../src/api/github";
-
-
-// Title function (component), that receive a `props` as an argument.
-// This props is an object that allow us to access the children
-// and params values. The params is all parameters that we pass into
-// the tag. The children is the internal value passed into it
-const Title = (props) =>{
-    // Get the `tag` parameter
-    const Tag = props.tag || 'h2';
-
-    return (
-        <>  
-            {/* Using javaScript variable value into <Tag> tag */}
-            <Tag>{props.children}</Tag>
-
-            {/* Defining style jsx to this scope */}
-            <style jsx>{`
-            ${Tag}{
-                color:${appConfig.theme.colors.primary['400']};
-                font-size: 1.5rem;
-                font-weight: 600;
-            }
-            `}</style>
-        </>
-
-    );
-}
-
-const GithubField = (props) => {
-  return(
-    <Text as="span" variant="body4" styleSheet={{
-      backgroundColor:appConfig.theme.colors.neutrals[900],
-      padding: ' 0.5rem 0.8rem',
-      display:'flex',
-      alignItems:'center',
-      gap:'0.8rem',
-      borderRadius: '1000px'
-    }}>
-      {props.children}
-    </Text>
-  )
-}
+// Components
+import Title from "../components/Title";
+import GithubField from "../components/GithubField";
 
 
 // Exporting default function
