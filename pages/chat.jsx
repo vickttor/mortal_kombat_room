@@ -4,12 +4,10 @@ import appConfig from '../config.json';
 // SUPABASE
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzQxNTAxMCwiZXhwIjoxOTU4OTkxMDEwfQ._yA0nE7QIEOE7MRrV2APgClz6zEig8uBX0Ci1N_o6sc';
-const SUPABASE_URL='https://htjdhwiqnqiarsqtgbuz.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-
 
 
 export default function ChatPage() {
@@ -50,12 +48,6 @@ export default function ChatPage() {
 
     // function to remove a specific message from the messageList
     function deleteMessage(messageToDelete){
-        let newMessageList = messageList.filter((message)=>{
-            if(message.id !== messageToDelete.id){
-                return message
-            }
-        })
-
         supabase.from('messages')
         .delete()
         .match({id: messageToDelete.id})
@@ -225,6 +217,7 @@ function MessageList(props) {
                 marginBottom: '16px',
             }}
         >
+
             {props.messages.map((objectMessage)=> {
                return (
                 <Text
