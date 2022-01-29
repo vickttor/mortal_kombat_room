@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@skynexui/components": "^1.23.9",
+    "@supabase/supabase-js": "^1.29.4",
     "lodash": "^4.17.21",
     "next": "^12.0.8",
     "react": "^17.0.2",

@@ -1,6 +1,16 @@
 import { Box, Text, TextField, Image, Button, Icon} from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+// SUPABASE
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzQxNTAxMCwiZXhwIjoxOTU4OTkxMDEwfQ._yA0nE7QIEOE7MRrV2APgClz6zEig8uBX0Ci1N_o6sc';
+const SUPABASE_URL='https://htjdhwiqnqiarsqtgbuz.supabase.co';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+
+
 
 export default function ChatPage() {
     // Message
@@ -14,15 +24,24 @@ export default function ChatPage() {
         
         if(newMessage !== "") {
             const objectMessages = {
-                id: messageList.length,
-                from: "Victor Silva",
+                from: "VictorSilva15",
                 text: newMessage
             };
-    
-            setMessageList([
-                objectMessages,
-                ...messageList,
-            ])
+            
+            supabase
+                .from('messages')
+                .insert([
+                    objectMessages
+                ])
+                .then(({data})=>{
+                    
+                    setMessageList([
+                        data[0],
+                        ...messageList,
+                    ])
+                })
+
+
     
             setMessage("");
         }
@@ -37,8 +56,26 @@ export default function ChatPage() {
             }
         })
 
-        setMessageList(newMessageList)
+        supabase.from('messages')
+        .delete()
+        .match({id: messageToDelete.id})
+        .then(({data})=>{
+            setMessageList(messageList.filter((message)=>message.id!==data[0].id))
+        })
+
+        
     }
+
+    React.useEffect(()=>{
+        supabase
+        .from("messages")
+        .select("*")
+        .order('id', {ascending:false})
+        .then(({data})=>{
+            setMessageList(data)
+        })
+    }, [])
+
 
 
     return (
@@ -226,7 +263,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/victorsilva15.png`}
+                                src={`https://github.com/${objectMessage.from}.png`}
                             />
                             <Text tag="strong">
                                 {objectMessage.from}
@@ -239,7 +276,7 @@ function MessageList(props) {
                                 }}
                                 tag="span"
                             >
-                                {(new Date().toLocaleTimeString())}
+                                {new Date(objectMessage.created_at).toLocaleDateString()}
                             </Text>
                         </Box>
 
