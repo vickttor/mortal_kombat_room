@@ -14,8 +14,15 @@ This repository store the source code of a chat application built in NextJS. The
 
 <br/>
 
-<img src="./.github/chatPage.png" alt="Chat Page"/>
+<img src="./.github/chatWithoutMessages.png" alt="Chat Without Messages"/>
 
+<br/>
+
+<img src="./.github/chatWithMessages.png" alt="Chat With Messages"/>
+
+<br/>
+
+<img src="./.github/loadingPage.png" alt="Loading Page"/>
 
 ## Requirements
 
@@ -28,16 +35,17 @@ To use you need to install all dependencies by using yarn or node. To do that, r
 ```bash
   # Install the dependencies
   yarn
-  
+
   # Runs the aplication in development environment
   yarn dev
 ```
 
 **OR**
+
 ```bash
   # Install the dependencies
   npm install
-  
+
   # Runs the aplication in development environment
   npm run dev
 ```
@@ -63,4 +71,3 @@ To use you need to install all dependencies by using yarn or node. To do that, r
 This project is under the MIT license [MIT](./LICENSE).
 
 Made with dedication by VictorSilva15
-
