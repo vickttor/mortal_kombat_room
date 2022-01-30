@@ -30,15 +30,15 @@ export default function GlobalStyle(){
                 flex: 1;
             }
             /* all browsers */
-            .chatSpace::-webkit-scrollbar {
+            .scrollBar::-webkit-scrollbar {
                 width: 0.5rem;               /* width of the entire scrollbar */
             }
 
-            .chatSpace::-webkit-scrollbar-track {
+            .scrollBar::-webkit-scrollbar-track {
                 background: #313D49;        /* color of the tracking area */
             }
 
-            .chatSpace::-webkit-scrollbar-thumb {
+            .scrollBar::-webkit-scrollbar-thumb {
                 background-color: #29333D;    /* color of the scroll thumb */
                 border-radius: 20px;       /* roundness of the scroll thumb */
                 border: 1px solid #101418;  /* creates padding around scroll thumb */ 

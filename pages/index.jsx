@@ -15,8 +15,8 @@ import _ from "lodash";
 import appConfig from "../config.json";
 import RequestGithubAPI from "../src/api/github";
 // Components
-import Title from "../components/Title";
-import GithubField from "../components/GithubField";
+import Title from "../src/components/Title";
+import GithubField from "../src/components/GithubField";
 
 
 // Exporting default function
@@ -30,9 +30,7 @@ export default function HomePage() {
 
     // Requiring data user from api github
     const [data, setData] = React.useState({});
-    // Using Debounce
-    // We're using useMemo to persist data in re-render
-    // this is essentialy to avoid lose data between the re-render of the debounce
+
     const onChange = (value) => {
       // Getting event.target.value as value from parameter
       RequestGithubAPI(value).then((data)=>{
@@ -85,7 +83,7 @@ export default function HomePage() {
                 event.preventDefault();
 
                 // Add the /chat path to nextjs manage the routes
-                router.push("/chat")
+                router.push(`/chat?username=${username}`)
               }}
               styleSheet={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -100,6 +98,7 @@ export default function HomePage() {
   
               <TextField
                 fullWidth
+                required
                 textFieldColors={{
                   neutral: {
                     textColor: appConfig.theme.colors.neutrals[200],
@@ -112,6 +111,9 @@ export default function HomePage() {
                 onChange={(event)=>{
                   setUsername(event.target.value)
                   debounceOnChange(event.target.value)
+                }}
+                styleSheet={{
+                  textAlign:'center'
                 }}
               />
               <Button

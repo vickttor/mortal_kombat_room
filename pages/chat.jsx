@@ -1,16 +1,48 @@
 import { Box, Text, TextField, Image, Button, Icon} from '@skynexui/components';
 import React from 'react';
+import { useRouter } from 'next/router';
+
+// Files/Components/Helpers
 import appConfig from '../config.json';
+import lowerCaseUsername from "../src/utils/lowerCaseUsername";
+import WaitingMessages from '../src/components/animations/WaitingMessages';
+import LoadingScreen from '../src/components/animations/loading';
+import Header from '../src/components/HeaderChat';
+import MessageList from '../src/components/MessageList';
+import {ButtonSendSticker} from "../src/components/ButtonSendSticker";
+
 // SUPABASE
 import { createClient } from "@supabase/supabase-js";
 
+// Getting environments variables
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Creating connection with supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
+//Update realtime chat
+function updateInRealtime(handleNewMessage){
+    return supabase
+    .from('messages')
+    .on("INSERT", (newMessage)=>{
+        handleNewMessage(newMessage.new);
+    })
+    .subscribe()
+}
+
+
+
+
 export default function ChatPage() {
+    // Router to get username
+    const router = useRouter();
+    const username = lowerCaseUsername(router.query.username);
+
+    // using state to hide loading page and show the chat
+    const [loading, setLoading] = React.useState(true);
+
     // Message
     const [message, setMessage] = React.useState('');
 
@@ -22,7 +54,7 @@ export default function ChatPage() {
         
         if(newMessage !== "") {
             const objectMessages = {
-                from: "VictorSilva15",
+                from: username,
                 text: newMessage
             };
             
@@ -30,15 +62,7 @@ export default function ChatPage() {
                 .from('messages')
                 .insert([
                     objectMessages
-                ])
-                .then(({data})=>{
-                    
-                    setMessageList([
-                        data[0],
-                        ...messageList,
-                    ])
-                })
-
+                ]).then()
 
     
             setMessage("");
@@ -58,6 +82,8 @@ export default function ChatPage() {
         
     }
 
+
+    // All code into useEffect, changes only when the page is refresh
     React.useEffect(()=>{
         supabase
         .from("messages")
@@ -66,22 +92,37 @@ export default function ChatPage() {
         .then(({data})=>{
             setMessageList(data)
         })
+
+        
+        // Calling the Realtime function to run
+        updateInRealtime((newMessage)=>{
+            setMessageList((messageList)=>{
+                return [
+                    newMessage,
+                    ...messageList,
+                ]
+            })
+        })
+
+        // Setting the LoadState to show the chat page and hide the loading page
+        setTimeout(() => setLoading(false), 3000);
     }, [])
 
 
-
+    // Content
     return (
         <Box
             styleSheet={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: appConfig.theme.colors.primary[400],   
+                backgroundColor: appConfig.theme.colors.neutrals[700],   
                 backgroundImage: `url(${appConfig.theme.backgroundImage})`,
                 backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 color: appConfig.theme.colors.neutrals['000'],
                 width: '100vw', height: '100vh',
             }}
-        >
-            <Box
+        >   
+            {!loading ? (
+                <Box
                 styleSheet={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -90,35 +131,38 @@ export default function ChatPage() {
                     borderRadius: '5px',
                     backgroundColor: appConfig.theme.colors.neutrals[700],
                     height: '100%',
-                    maxWidth: '95%',
+                    maxWidth: 'min(1100px, 95%)',
                     maxHeight: '95vh',
                     padding: '1rem',
                 }}
             >
-                <Header />
+                <Header username={username}/>
+
                 <Box
                     styleSheet={{
-                        position: 'relative',
                         display: 'flex',
                         flex: 1,
-                        height: '80%',
                         backgroundColor: appConfig.theme.colors.neutrals[600],
                         flexDirection: 'column',
                         borderRadius: '5px',
-                        padding: '16px',
+                        padding: '1rem',
+                        overflowY:'hidden'
                     }}
                 >
 
-                    {/* Message list */}
-                    <MessageList messages={messageList} onRemove={deleteMessage} />
+                    {messageList.length == 0 ? (
+                        <WaitingMessages/>
+                    ): (
+                        <MessageList messages={messageList} onRemove={deleteMessage} username={username}/>
+                    )}
+                    
                      
                     <Box
                         as="form"
                         styleSheet={{
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: 'initial',
                             justifyContent: "center",
-                            flexDirection: "row",
                             gap: "0.8rem",
                         }}
                         onSubmit={(event)=>{
@@ -145,20 +189,24 @@ export default function ChatPage() {
                             placeholder="Insert a Message..."
                             type="textarea"
                             styleSheet={{
-                                width: '100%',
+                                width:'100%',
                                 border: '0',
                                 resize: 'none',
                                 borderRadius: '5px',
-                                padding: '6px 8px',
+                                padding: ' 0.3rem 0.5rem',
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
 
+                        <ButtonSendSticker onStickerClick={(sticker)=>{
+                            handleNewMessage(":sticker:"+sticker)
+                        }}/>
+                            
                         <Button 
                         type="submit" 
                         label="send"
-                        size="xl" 
+                        size="xs"
                         variant="secondary"
                         buttonColors={{
                             contrastColor: appConfig.theme.colors.neutrals["000"],
@@ -166,135 +214,24 @@ export default function ChatPage() {
                             mainColorLight: appConfig.theme.colors.primary[400],
                             mainColorStrong: appConfig.theme.colors.primary[800],
                         }}
+                        styleSheet={{
+                            width:{
+                                "xs": "90px",
+                            },
+                            height:{
+                                "xs": "50px",
+                            }
+                        }}
                         />
 
                     </Box>
                 </Box>
             </Box>
+                
+            ) :  (
+                <LoadingScreen/>
+            )}
+            
         </Box>
     )
 }
-
-function Header() {
-    return (
-        <>
-            <Box styleSheet={{ 
-                width: '100%', marginBottom: '16px', display: 'flex', alignItems: 'center', 
-                justifyContent: 'space-between', flexDirection:{xs:"column", md: "row"},
-                gap:"0.5rem"
-            }}>
-                <Text variant='heading5'>
-                    CHAT
-                </Text>
-                <Image src="https://cdn2.steamgriddb.com/file/sgdb-cdn/logo/4d7a968bb636e25818ff2a3941db08c1.png" 
-                styleSheet={{
-                    width:'150px',
-                }}
-                alt="MK11"/>
-                <Button
-                    variant='tertiary'
-                    colorVariant='neutral'
-                    label='Logout'
-                    href="/"
-                />
-            </Box>
-        </>
-    )
-}
-
-function MessageList(props) {
-
-    return (
-        <Box
-            className='chatSpace'
-            tag="ul"
-            styleSheet={{
-                overflow: 'scroll',
-                display: 'flex',
-                flexDirection: 'column-reverse',
-                flex: 1,
-                color: appConfig.theme.colors.neutrals["000"],
-                marginBottom: '16px',
-            }}
-        >
-
-            {props.messages.map((objectMessage)=> {
-               return (
-                <Text
-                    key={objectMessage.id}
-                    tag="li"
-                    styleSheet={{
-                        borderRadius: '5px',
-                        padding: '6px',
-                        marginBottom: '12px',
-                        hover: {
-                            backgroundColor: appConfig.theme.colors.neutrals[700],
-                        }
-                    }}
-                >
-                    <Box
-                        styleSheet={{
-                            marginBottom: '8px',
-                            display:'flex',
-                            alignItems:'center',
-                            justifyContent: "space-between",
-                            padding: "0.5rem 1rem 0.5rem 0.5rem",
-                            
-                        }}
-                    >
-                        <Box styleSheet={{
-                            display:"flex",
-                            alignItems:"center",
-                            gap:"0.8rem",
-                            flexWrap:"wrap"
-                        }}>
-                            <Image
-                                styleSheet={{
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    display: 'inline-block',
-                                    marginRight: '8px',
-                                }}
-                                src={`https://github.com/${objectMessage.from}.png`}
-                            />
-                            <Text tag="strong">
-                                {objectMessage.from}
-                            </Text>
-                            <Text
-                                styleSheet={{
-                                    fontSize: '10px',
-                                    marginLeft: '8px',
-                                    color: appConfig.theme.colors.neutrals[300],
-                                }}
-                                tag="span"
-                            >
-                                {new Date(objectMessage.created_at).toLocaleDateString()}
-                            </Text>
-                        </Box>
-
-
-                        {/* remove button */}
-                        <Icon 
-                            styleSheet={{
-                                    color: appConfig.theme.colors.neutrals[200],
-                                    hover:{
-                                        color:appConfig.theme.colors.primary[600]
-                                    },
-                                    cursor:"pointer"
-                                }}
-                                name="FaTrash" 
-                                size="1.5ch"
-                                rounded='md'
-                            onClick={()=>props.onRemove(objectMessage)}
-                        />
-                        
-                    </Box>
-                    {objectMessage.text}
-                </Text>
-               )
-            })}  
-        </Box>
-    );
-}
-

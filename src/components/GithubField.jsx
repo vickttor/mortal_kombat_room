@@ -1,5 +1,5 @@
 import { Text } from "@skynexui/components"
-import appConfig from "../config.json"
+import appConfig from "../../config.json"
 
 const GithubField = (props) => {
     return(
