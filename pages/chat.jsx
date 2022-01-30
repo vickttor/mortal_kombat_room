@@ -23,7 +23,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
 //Update realtime chat
-function updateInRealtime(handleNewMessage){
+function updateInsertInRealtime(handleNewMessage){
     return supabase
     .from('messages')
     .on("INSERT", (newMessage)=>{
@@ -32,13 +32,23 @@ function updateInRealtime(handleNewMessage){
     .subscribe()
 }
 
-
+//Update Message deleted
+function updateDeleteInRealTime(handleDeletedMessage){
+    return supabase
+    .from('messages')
+    .on("DELETE", ({old})=>{
+        handleDeletedMessage(old.id);
+    })
+    
+}
 
 
 export default function ChatPage() {
     // Router to get username
     const router = useRouter();
     const username = lowerCaseUsername(router.query.username);
+
+
 
     // using state to hide loading page and show the chat
     const [loading, setLoading] = React.useState(true);
@@ -63,7 +73,7 @@ export default function ChatPage() {
                 .insert([
                     objectMessages
                 ]).then(()=>{
-                    console.log("message added")
+                    //console.log("message added")
                 })
 
     
@@ -77,8 +87,9 @@ export default function ChatPage() {
         supabase.from('messages')
         .delete()
         .match({id: messageToDelete.id})
-        .then(({data})=>{
-            setMessageList(messageList.filter((message)=>message.id!==data[0].id))
+        .then(()=>{
+            //console.log("message deleted")
+            //setMessageList(messageList.filter((message)=>message.id!==data[0].id))
         })
 
         
@@ -87,17 +98,10 @@ export default function ChatPage() {
 
     // All code into useEffect, changes only when the page is refresh
     React.useEffect(()=>{
+        // Setting the LoadState to show the chat page and hide the loading page
+        setTimeout(() => setLoading(false), 3000);
 
-       // Calling the Realtime function to run
-       updateInRealtime((newMessage)=>{
-        setMessageList((messageList)=>{
-            return [
-                newMessage,
-                ...messageList,
-            ]
-        })
-        })
-
+        // Pussing all messages from database
         supabase
         .from("messages")
         .select("*")
@@ -106,11 +110,28 @@ export default function ChatPage() {
             setMessageList(data)
         })
 
-        
- 
 
-        // Setting the LoadState to show the chat page and hide the loading page
-        setTimeout(() => setLoading(false), 3000);
+        // Calling the Realtime function to update on Insert
+        const InsertedMessageSubscription = updateInsertInRealtime((newMessage)=>{
+            setMessageList((messageList)=>{
+                return [
+                    newMessage,
+                    ...messageList,
+                ]
+            });
+        });
+
+        // Calling the Realtime function to update on Delete
+        updateDeleteInRealTime((oldId)=>{
+            setMessageList((messageList)=>{
+                return messageList.filter((message)=>message.id!==oldId)
+            });
+        });
+
+        return () => {
+            InsertedMessageSubscription.unsubscribe()
+        }
+
     }, [])
 
 
