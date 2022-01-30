@@ -83,7 +83,15 @@ export default function HomePage() {
                 event.preventDefault();
 
                 // Add the /chat path to nextjs manage the routes
-                router.push(`/chat?username=${username}`)
+                RequestGithubAPI(username).then((data)=>{
+                  if (data.login !== undefined){
+                    router.push(`/chat?username=${username}`)
+                  }else{
+                    window.alert('Invalid User')
+                  }
+                })
+
+                
               }}
               styleSheet={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -148,14 +156,27 @@ export default function HomePage() {
                 minHeight: '240px',
               }}
             >
+            {data.login !== undefined ?
               <Image
                 styleSheet={{
                   borderRadius: '50%',
                   marginBottom: '16px',
                 }}
-                src={`https://github.com/${username || "skynexui"}.png`}
+                src={`https://github.com/${username}.png`}
                 alt="Photo User"
               />
+             :
+             <Image
+                styleSheet={{
+                  borderRadius: '50%',
+                  marginBottom: '16px',
+                }}
+                src={`images/defaultUser.png`}
+                alt="404 User not found"
+              />
+             
+             }
+              
               <Text
                 variant="body4"
                 styleSheet={{
