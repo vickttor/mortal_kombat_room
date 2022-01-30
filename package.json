@@ -12,6 +12,7 @@
   "dependencies": {
     "@skynexui/components": "^1.23.9",
     "@supabase/supabase-js": "^1.29.4",
+    "dotenv": "^14.3.2",
     "lodash": "^4.17.21",
     "next": "^12.0.8",
     "react": "^17.0.2",

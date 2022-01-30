@@ -12,7 +12,8 @@ export default function GlobalStyle(){
             }
 
             body{
-                font-family: 'Open Sans', sans-serif;
+                font-family: 'Acme', sans-serif;
+                font-family: 'Nunito Sans', sans-serif; 
                 /* Firefox scrollbar*/
                 scrollbar-width: thin;
                 scrollbar-color: #29333D #313D49

@@ -15,8 +15,8 @@ import {ButtonSendSticker} from "../src/components/ButtonSendSticker";
 import { createClient } from "@supabase/supabase-js";
 
 // Getting environments variables
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 // Creating connection with supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -62,7 +62,9 @@ export default function ChatPage() {
                 .from('messages')
                 .insert([
                     objectMessages
-                ]).then()
+                ]).then(()=>{
+                    console.log("message added")
+                })
 
     
             setMessage("");
@@ -85,6 +87,17 @@ export default function ChatPage() {
 
     // All code into useEffect, changes only when the page is refresh
     React.useEffect(()=>{
+
+       // Calling the Realtime function to run
+       updateInRealtime((newMessage)=>{
+        setMessageList((messageList)=>{
+            return [
+                newMessage,
+                ...messageList,
+            ]
+        })
+        })
+
         supabase
         .from("messages")
         .select("*")
@@ -94,15 +107,7 @@ export default function ChatPage() {
         })
 
         
-        // Calling the Realtime function to run
-        updateInRealtime((newMessage)=>{
-            setMessageList((messageList)=>{
-                return [
-                    newMessage,
-                    ...messageList,
-                ]
-            })
-        })
+ 
 
         // Setting the LoadState to show the chat page and hide the loading page
         setTimeout(() => setLoading(false), 3000);

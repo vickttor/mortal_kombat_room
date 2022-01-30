@@ -11,7 +11,7 @@ export default function Header({username}) {
                 <Text variant='heading5'>
                     CHAT
                 </Text>
-                <Image src="mk11_title_chat.png" 
+                <Image src="images/mk11_title_chat.png" 
                 styleSheet={{
                     width:'150px',
                 }}
