@@ -9,11 +9,10 @@ export default function GlobalStyle(){
                 padding:0;
                 box-sizing:border-box;
                 list-style:none;
+                font-family: 'Roboto Condensed', sans-serif;
             }
 
             body{
-                font-family: 'Acme', sans-serif;
-                font-family: 'Nunito Sans', sans-serif; 
                 /* Firefox scrollbar*/
                 scrollbar-width: thin;
                 scrollbar-color: #29333D #313D49
