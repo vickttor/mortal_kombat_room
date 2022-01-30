@@ -1,4 +1,5 @@
 import { Box, Text, Image, Icon } from "@skynexui/components";
+import fixDateTime from "../utils/fixDatetime"
 import appConfig from "../../config.json";
 
 export default function MessageList(props) {
@@ -68,7 +69,7 @@ export default function MessageList(props) {
                                 }}
                                 tag="span"
                             >
-                                {new Date(objectMessage.created_at).toLocaleDateString()}
+                                {fixDateTime(new Date(objectMessage.created_at).toLocaleString())}
                             </Text>
                             
                             {/* remove button */}
