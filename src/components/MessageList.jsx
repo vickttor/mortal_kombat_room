@@ -36,7 +36,8 @@ export default function MessageList(props) {
                         marginBottom: '12px',                  
                         backgroundColor: objectMessage.from !== props.username ? 
                         appConfig.theme.colors.neutrals[700] : appConfig.theme.colors.primary['700s'],
-                        overflowWrap:'break-word',
+                        maxWidth:'100%',
+                        overflowWrap: 'break-word'
                     }}>
 
                         <Box
